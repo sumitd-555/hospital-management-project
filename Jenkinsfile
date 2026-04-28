@@ -1,7 +1,7 @@
 pipeline {
     agent {
-    label 'app-node'
-}
+        label 'APP-node'
+    }
 
     environment {
         AWS_DEFAULT_REGION = 'ap-south-1'
