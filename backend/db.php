@@ -3,7 +3,7 @@
 $conn = new mysqli(
     "your-rds-endpoint",
     "admin",
-    "Admin@12345",
+    "Hospital123",
     "hospitaldb"
 );
 
