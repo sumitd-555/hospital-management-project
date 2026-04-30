@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        label 'APP-node'
+        label 'jenkins-slave'
     }
 
     environment {
