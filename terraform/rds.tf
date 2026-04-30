@@ -18,7 +18,7 @@ resource "aws_db_instance" "mysql_db" {
   instance_class       = "db.t3.micro"
   db_name              = "hospitaldb"
   username             = "admin"
-  password             = "Admin@12345"
+  password             = "Hospital123"
   skip_final_snapshot  = true
   db_subnet_group_name = aws_db_subnet_group.default.name
   publicly_accessible  = false
