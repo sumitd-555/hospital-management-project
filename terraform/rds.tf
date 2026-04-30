@@ -11,14 +11,6 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "hospital-igw"
-  }
-}
-
 resource "aws_db_instance" "mysql_db" {
   allocated_storage    = 20
   engine               = "mysql"
