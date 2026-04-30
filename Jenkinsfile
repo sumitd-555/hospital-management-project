@@ -49,23 +49,24 @@ pipeline {
         }
 
         stage('Deploy Application to Apache') {
-    steps {
-        sh '''
-            echo "Deploying project to /var/www/html..."
+            steps {
+                sh '''
+                    echo "Deploying project to /var/www/html..."
 
-            sudo mkdir -p /var/www/html
+                    sudo mkdir -p /var/www/html
 
-            sudo rm -rf /var/www/html/*
+                    sudo rm -rf /var/www/html/*
 
-            sudo cp -r frontend/* /var/www/html/
-            sudo cp -r backend/* /var/www/html/
+                    sudo cp -r frontend/* /var/www/html/
+                    sudo cp -r backend/* /var/www/html/
 
-            sudo chmod -R 755 /var/www/html/
+                    sudo chmod -R 755 /var/www/html/
 
-            sudo systemctl restart httpd || sudo systemctl restart apache2
-        '''
+                    sudo systemctl restart httpd || sudo systemctl restart apache2
+                '''
+            }
+        }
     }
-}
 
     post {
         success {
