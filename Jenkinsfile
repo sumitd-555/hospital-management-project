@@ -47,11 +47,29 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy Application to Apache') {
+            steps {
+                sh '''
+                    echo "Deploying project to /var/www/html..."
+
+                    sudo rm -rf /var/www/html/*
+
+                    sudo cp -r * /var/www/html/
+
+                    sudo chown -R www-data:www-data /var/www/html/
+                    sudo chmod -R 755 /var/www/html/
+
+                    sudo systemctl restart apache2
+                    sudo systemctl status apache2
+                '''
+            }
+        }
     }
 
     post {
         success {
-            echo 'Infrastructure deployed successfully!'
+            echo 'Infrastructure + Application deployed successfully!'
         }
 
         failure {
