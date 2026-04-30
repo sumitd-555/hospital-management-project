@@ -48,14 +48,18 @@ pipeline {
             }
         }
 
+        // PUT YOUR DEPLOY CODE HERE
         stage('Deploy Application to Apache') {
             steps {
                 sh '''
                     echo "Deploying project to /var/www/html..."
 
+                    sudo mkdir -p /var/www/html
+
                     sudo rm -rf /var/www/html/*
 
-                    sudo cp -r * /var/www/html/
+                    sudo cp -r frontend/* /var/www/html/
+                    sudo cp -r backend/* /var/www/html/
 
                     sudo chown -R www-data:www-data /var/www/html/
                     sudo chmod -R 755 /var/www/html/
@@ -65,6 +69,7 @@ pipeline {
                 '''
             }
         }
+
     }
 
     post {
