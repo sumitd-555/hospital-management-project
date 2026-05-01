@@ -38,7 +38,7 @@ pipeline {
     steps {
         sh """
         ssh -o StrictHostKeyChecking=no \
-        -i /root/jenkins-slave/.ssh/hospital-key.pem \
+        -i /root/jenkins-slave/.ssh/hospital-key \
         ec2-user@${EC2_IP} << 'EOF'
 
                 sudo yum update -y
