@@ -34,10 +34,12 @@ pipeline {
             }
         }
 
-        stage('Deploy using Docker') {
-            steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no -i newkey.pem ec2-user@${EC2_IP} << 'EOF'
+       stage('Deploy using Docker') {
+    steps {
+        sh """
+        ssh -o StrictHostKeyChecking=no \
+        -i /root/jenkins-slave/.ssh/newkey.pem \
+        ec2-user@${EC2_IP} << 'EOF'
 
                 sudo yum update -y
 
