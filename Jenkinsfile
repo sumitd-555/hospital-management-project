@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'ap-south-1'
+        SSH_KEY = '/root/jenkins-slave/.ssh/hospital-key'
     }
 
     stages {
@@ -23,45 +24,67 @@ pipeline {
             }
         }
 
-       stage('Deploy using Docker') {
-    steps {
-        sh """
-        ssh -o StrictHostKeyChecking=no \
-        -i /root/jenkins-slave/.ssh/hospital-key \
-        ec2-user@${EC2_IP} << 'EOF'
+        stage('Get EC2 IP') {
+            steps {
+                script {
+                    env.EC2_IP = sh(
+                        script: "cd terraform && terraform output -raw public_ip",
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
 
-        set -e
+        stage('Deploy using Docker') {
+            steps {
+                sh """
+                ssh -o StrictHostKeyChecking=no \
+                -i ${SSH_KEY} \
+                ec2-user@${EC2_IP} << 'EOF'
 
-        echo "Installing Docker..."
-        sudo yum update -y
-        sudo yum install -y docker
+                set -e
 
-        sudo service docker start
-        sudo systemctl enable docker
+                echo "Installing Docker..."
+                sudo yum update -y
+                sudo yum install -y docker
 
-        sudo usermod -a -G docker ec2-user || true
+                sudo service docker start
+                sudo systemctl enable docker
 
-        echo "Installing Git..."
-        sudo yum install -y git
+                sudo usermod -a -G docker ec2-user || true
 
-        echo "Installing Docker Compose..."
-        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" \
-        -o /usr/local/bin/docker-compose
+                echo "Installing Git..."
+                sudo yum install -y git
 
-        sudo chmod +x /usr/local/bin/docker-compose
+                echo "Installing Docker Compose..."
+                sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" \
+                -o /usr/local/bin/docker-compose
 
-        echo "Cloning repo..."
-        rm -rf hospital-management-project
-        git clone https://github.com/sumitd-555/hospital-management-project.git
+                sudo chmod +x /usr/local/bin/docker-compose
 
-        cd hospital-management-project
+                echo "Cloning repo..."
+                rm -rf hospital-management-project
+                git clone https://github.com/sumitd-555/hospital-management-project.git
 
-        echo "Running containers..."
-        sudo docker-compose down || true
-        sudo docker-compose up -d --build
+                cd hospital-management-project
 
-        EOF
-        """
+                echo "Running containers..."
+                sudo docker-compose down || true
+                sudo docker-compose up -d --build
+
+                EOF
+                """
+            }
+        }
     }
-}
+
+    post {
+        success {
+            echo "🚀 Deployment Successful - Website LIVE at http://${EC2_IP}"
+        }
+
+        failure {
+            echo "❌ Deployment Failed"
+        }
+    }
 }
