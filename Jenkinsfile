@@ -23,17 +23,6 @@ pipeline {
             }
         }
 
-        stage('Get EC2 IP') {
-            steps {
-                script {
-                    env.EC2_IP = sh(
-                        script: "cd terraform && terraform output -raw public_ip",
-                        returnStdout: true
-                    ).trim()
-                }
-            }
-        }
-
        stage('Deploy using Docker') {
     steps {
         sh """
@@ -41,37 +30,38 @@ pipeline {
         -i /root/jenkins-slave/.ssh/hospital-key \
         ec2-user@${EC2_IP} << 'EOF'
 
-                sudo yum update -y
+        set -e
 
-                # Install Docker (if not installed)
-                sudo yum install -y docker
-                sudo systemctl start docker
-                sudo systemctl enable docker
-                sudo usermod -aG docker ec2-user
+        echo "Installing Docker..."
+        sudo yum update -y
+        sudo yum install -y docker
 
-                # Clone repo on server
-                rm -rf hospital-management-project
-                git clone https://github.com/sumitd-555/hospital-management-project.git
+        sudo service docker start
+        sudo systemctl enable docker
 
-                cd hospital-management-project
+        sudo usermod -a -G docker ec2-user || true
 
-                # Build and run containers
-                sudo docker-compose down || true
-                sudo docker-compose up -d --build
+        echo "Installing Git..."
+        sudo yum install -y git
 
-                EOF
-                """
-            }
-        }
+        echo "Installing Docker Compose..."
+        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" \
+        -o /usr/local/bin/docker-compose
+
+        sudo chmod +x /usr/local/bin/docker-compose
+
+        echo "Cloning repo..."
+        rm -rf hospital-management-project
+        git clone https://github.com/sumitd-555/hospital-management-project.git
+
+        cd hospital-management-project
+
+        echo "Running containers..."
+        sudo docker-compose down || true
+        sudo docker-compose up -d --build
+
+        EOF
+        """
     }
-
-    post {
-        success {
-            echo "🚀 Docker-based website is LIVE!"
-        }
-
-        failure {
-            echo "❌ Deployment failed"
-        }
-    }
+}
 }
