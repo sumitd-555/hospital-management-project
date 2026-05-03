@@ -45,38 +45,43 @@ pipeline {
         set -e
 
                 echo "Installing Docker..."
-                sudo yum update -y
-                sudo yum install -y docker
 
-                sudo service docker start
-                sudo systemctl enable docker
+        sudo apt update -y
+        sudo apt install -y docker.io
 
-                sudo usermod -a -G docker ec2-user || true
+        sudo systemctl start docker
+        sudo systemctl enable docker
 
-                echo "Installing Git..."
-                sudo yum install -y git
+        sudo usermod -aG docker ubuntu
 
-                echo "Installing Docker Compose..."
-                sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)" \
-                -o /usr/local/bin/docker-compose
+        cd /home/ubuntu
 
-                sudo chmod +x /usr/local/bin/docker-compose
+        if [ ! -d hospital-management-project ]; then
+            git clone https://github.com/sumitd-555/hospital-management-project.git
+        fi
 
-                echo "Cloning repo..."
-                rm -rf hospital-management-project
-                git clone https://github.com/sumitd-555/hospital-management-project.git
+        cd hospital-management-project/frontend
 
-                cd hospital-management-project
+        echo "Stopping old container..."
 
-                echo "Running containers..."
-                sudo docker-compose down || true
-                sudo docker-compose up -d --build
+        sudo docker stop hospital-app || true
+        sudo docker rm hospital-app || true
 
-                EOF
-                """
-            }
-        }
-    }
+        echo "Building Docker image..."
+
+        sudo docker build -t hospital-app .
+
+        echo "Running new container..."
+
+        sudo docker run -d \
+            --name hospital-app \
+            -p 80:80 \
+            hospital-app
+
+        echo "Deployment completed successfully"
+
+        EOF
+        """
 
     post {
         success {
