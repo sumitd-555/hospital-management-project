@@ -36,8 +36,8 @@ pipeline {
         }
 
         stage('Deploy using Docker') {
-    steps {
-        sh """
+            steps {
+                sh """
 ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${EC2_IP} << EOF
 set -e
 
@@ -79,8 +79,11 @@ echo "Deployment completed successfully"
 
 EOF
 """
-    }
-}
+            }
+        }
+
+    }   // ← THIS closing brace was missing for stages
+
     post {
         success {
             echo "🚀 Deployment Successful - Website LIVE at http://${EC2_IP}"
