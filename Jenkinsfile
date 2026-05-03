@@ -35,14 +35,14 @@ pipeline {
             }
         }
 
-        stage('Deploy using Docker') {
-            steps {
-                sh """
-                ssh -o StrictHostKeyChecking=no \
-                -i ${SSH_KEY} \
-                ec2-user@${EC2_IP} << 'EOF'
+       stage('Deploy using Docker') {
+    steps {
+        sh """
+        ssh -o StrictHostKeyChecking=no \
+        -i ${SSH_KEY} \
+        ubuntu@${EC2_IP} << 'EOF'
 
-                set -e
+        set -e
 
                 echo "Installing Docker..."
                 sudo yum update -y
