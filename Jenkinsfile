@@ -57,7 +57,7 @@ if [ ! -d hospital-management-project ]; then
     git clone https://github.com/sumitd-555/hospital-management-project.git
 fi
 
-cd hospital-management-project/frontend
+cd hospital-management-project
 
 echo "Stopping old container..."
 
