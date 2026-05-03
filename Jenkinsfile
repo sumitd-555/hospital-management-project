@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_DEFAULT_REGION = 'ap-south-1'
-        SSH_KEY = '/root/jenkins-slave/.ssh/newkey'
+        SSH_KEY = '/root/jenkins-slave/.ssh/newkey.pem'
     }
 
     stages {
