@@ -3,7 +3,7 @@ resource "aws_instance" "frontend_server" {
   instance_type          = "t3.small"
   subnet_id              = aws_subnet.public_subnet.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = "newkey"
+  key_name               = "newkey.pem"
 
   tags = {
     Name = "Frontend-Server"
