@@ -80,6 +80,9 @@ pipeline {
 
         echo "Deployment completed successfully"
 
+        }
+      }
+     } 
         EOF
         """
 
